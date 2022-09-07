@@ -7,7 +7,7 @@ import com.aungbophyoe.space.movietimecodetest.data.MovieDetailDao
 import com.aungbophyoe.space.movietimecodetest.model.MovieCacheEntity
 import com.aungbophyoe.space.movietimecodetest.model.MovieDetailCacheEntity
 
-@Database(entities = [MovieDetailCacheEntity::class, MovieCacheEntity::class],version = 1,exportSchema = true)
+@Database(entities = [MovieDetailCacheEntity::class, MovieCacheEntity::class],version = 1,exportSchema = false)
 abstract class MovieDetailDatabase : RoomDatabase() {
     companion object {
         const val DatabaseName = "movieDetailDatabase"

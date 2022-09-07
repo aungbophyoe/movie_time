@@ -3,8 +3,6 @@ package com.aungbophyoe.space.movietimecodetest.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aungbophyoe.space.movietimecodetest.adapter.PopularMovieAdapter
@@ -12,12 +10,12 @@ import com.aungbophyoe.space.movietimecodetest.adapter.UpComingMovieAdapter
 import com.aungbophyoe.space.movietimecodetest.databinding.ActivityMainBinding
 import com.aungbophyoe.space.movietimecodetest.utility.DataState
 import com.aungbophyoe.space.movietimecodetest.utility.showOrGone
-import com.aungbophyoe.space.movietimecodetest.viewmodels.DetailViewModel
 import com.aungbophyoe.space.movietimecodetest.viewmodels.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener,UpComingMovieAdapter.ItemCardOnClickListener {
+class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener
+    ,UpComingMovieAdapter.ItemCardOnClickListener{
     private var _binding : ActivityMainBinding? = null
     private val binding get() = _binding
     private val homeViewModel : HomeViewModel by viewModels()
@@ -148,4 +146,5 @@ class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener
     override fun itemCardOnClick(id: Int) {
         goDetail(id)
     }
+
 }

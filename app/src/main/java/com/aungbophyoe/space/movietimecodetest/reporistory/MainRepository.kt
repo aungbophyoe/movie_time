@@ -5,14 +5,13 @@ import com.aungbophyoe.space.movietimecodetest.BuildConfig
 import com.aungbophyoe.space.movietimecodetest.data.MovieDao
 import com.aungbophyoe.space.movietimecodetest.data.MovieDetailDao
 import com.aungbophyoe.space.movietimecodetest.mapper.CacheMapper
-import com.aungbophyoe.space.movietimecodetest.mapper.MovieCacheMapper
 import com.aungbophyoe.space.movietimecodetest.mapper.NetworkMapper
-import com.aungbophyoe.space.movietimecodetest.model.Movie
+import com.aungbophyoe.space.movietimecodetest.model.MovieCacheEntity
 import com.aungbophyoe.space.movietimecodetest.model.MovieDetail
 import com.aungbophyoe.space.movietimecodetest.network.ApiService
-import com.aungbophyoe.space.movietimecodetest.utility.Constants
 import com.aungbophyoe.space.movietimecodetest.utility.Constants.isNetworkAvailable
 import com.aungbophyoe.space.movietimecodetest.utility.DataState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -23,29 +22,33 @@ class MainRepository @Inject constructor(
     private val movieDetailDao: MovieDetailDao,
     private val movieDao: MovieDao,
     private val cacheMapper: CacheMapper,
-    private val networkMapper: NetworkMapper,
-    private val movieCacheMapper: MovieCacheMapper
+    private val networkMapper: NetworkMapper
 ) {
-    suspend fun getAllPopularMovies() : Flow<DataState<List<Movie>>> = flow {
+    suspend fun getAllPopularMovies() : Flow<DataState<List<MovieCacheEntity>>> = flow {
         emit(DataState.Loading)
-        kotlinx.coroutines.delay(1000)
         try {
             if(isNetworkAvailable(context)){
+                val dbData = movieDao.getAllPopularMovie()
+                if(dbData.isNotEmpty()){
+                    emit(DataState.Success(dbData))
+                }
+                emit(DataState.Loading)
+                delay(1000)
                 val response = apiService.getAllPopularMovies(BuildConfig.AUTH_TOKEN,1)
                 if(response.isSuccessful){
                     val networkData = response.body()
-                    val data = movieCacheMapper.mapToEntityList(networkData!!.results)
+                    val data = networkData!!.results
                     data.map {
                         it.isPopular = true
                         movieDao.insertAll(it)
                     }
                     val dbData = movieDao.getAllPopularMovie()
-                    emit(DataState.Success(movieCacheMapper.mapFromEntityList(dbData)))
+                    emit(DataState.Success(dbData))
                 }
             }else{
                 val dbData = movieDao.getAllPopularMovie()
-                if(dbData!=null){
-                    emit(DataState.Success(movieCacheMapper.mapFromEntityList(dbData)))
+                if(dbData.isNotEmpty()){
+                    emit(DataState.Success(dbData))
                 }else{
                     emit(DataState.TryAgain)
                 }
@@ -55,26 +58,31 @@ class MainRepository @Inject constructor(
         }
     }
 
-    suspend fun getAllUpComingMovies() : Flow<DataState<List<Movie>>> = flow {
+    suspend fun getAllUpComingMovies() : Flow<DataState<List<MovieCacheEntity>>> = flow {
         emit(DataState.Loading)
-        kotlinx.coroutines.delay(1000)
         try {
             if(isNetworkAvailable(context)){
+                val dbData = movieDao.getAllUpcomingMovie()
+                if(dbData.isNotEmpty()){
+                    emit(DataState.Success(dbData))
+                }
+                delay(1000)
+                emit(DataState.Loading)
                 val response = apiService.getAllUpComingMovies(BuildConfig.AUTH_TOKEN,1)
                 if(response.isSuccessful){
                     val networkData = response.body()
-                    val data = movieCacheMapper.mapToEntityList(networkData!!.results)
+                    val data = networkData!!.results
                     data.map {
                         it.isUpcoming = true
                         movieDao.insertAll(it)
                     }
                     val dbData = movieDao.getAllUpcomingMovie()
-                    emit(DataState.Success(movieCacheMapper.mapFromEntityList(dbData)))
+                    emit(DataState.Success(dbData))
                 }
             }else{
                 val dbData = movieDao.getAllUpcomingMovie()
                 if(dbData!=null){
-                    emit(DataState.Success(movieCacheMapper.mapFromEntityList(dbData)))
+                    emit(DataState.Success(dbData))
                 }else{
                     emit(DataState.TryAgain)
                 }
@@ -96,7 +104,11 @@ class MainRepository @Inject constructor(
         emit(DataState.Loading)
         try {
             if(isNetworkAvailable(context)){
-                kotlinx.coroutines.delay(1000)
+                val updateData = movieDetailDao.getMovieDetail(id)
+                if(updateData!=null){
+                    emit(DataState.Success(cacheMapper.mapFromEntity(updateData)))
+                }
+                emit(DataState.Loading)
                 val response = apiService.getMovieDetails(id.toString(),BuildConfig.AUTH_TOKEN)
                 if(response.isSuccessful){
                     val networkData = response.body()
