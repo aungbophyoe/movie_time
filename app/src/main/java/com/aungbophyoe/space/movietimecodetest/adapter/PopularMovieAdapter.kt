@@ -18,15 +18,16 @@ class PopularMovieAdapter(
     class ViewHolder(private val binding: RvMoviePopularItemBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(movie: MovieCacheEntity){
             binding.apply {
-                ImageBinderAdapter.setImageUrl(ivImage,movie.poster_path)
+                ImageBinderAdapter.setImageUrl(ivImage,movie.poster_path ?: "https://picsum.photos/200")
                 tvTitle.text = movie.title
-                tvVote.text = "${movie.vote_average * 10} %"
+                val voteAvg = movie.vote_average ?: 1.0
+                tvVote.text = "${voteAvg * 10} %"
             }
         }
     }
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     interface ItemOnClickListener{
-        fun itemOnClick(id:Int)
+        fun itemOnClick(id:String)
     }
 
     object DiffUtils : DiffUtil.ItemCallback<MovieCacheEntity>(){

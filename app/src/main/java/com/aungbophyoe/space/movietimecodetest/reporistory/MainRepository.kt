@@ -38,9 +38,12 @@ class MainRepository @Inject constructor(
                 if(response.isSuccessful){
                     val networkData = response.body()
                     val data = networkData!!.results
-                    data.map {
+                    val list = data.map {
+                        MovieCacheEntity(it.id.toString(),it.overview,it.posterPath,it.title,it.voteAverage,isUpcoming = true)
+                    }
+                    list.map {
                         it.isPopular = true
-                        movieDao.insertAll(it)
+                        movieDao.insert(it)
                     }
                     val dbData = movieDao.getAllPopularMovie()
                     emit(DataState.Success(dbData))
@@ -48,40 +51,6 @@ class MainRepository @Inject constructor(
             }else{
                 val dbData = movieDao.getAllPopularMovie()
                 if(dbData.isNotEmpty()){
-                    emit(DataState.Success(dbData))
-                }else{
-                    emit(DataState.TryAgain)
-                }
-            }
-        }catch (e:Exception){
-            emit(DataState.Error(e))
-        }
-    }
-
-    suspend fun getAllUpComingMovies() : Flow<DataState<List<MovieCacheEntity>>> = flow {
-        emit(DataState.Loading)
-        try {
-            if(isNetworkAvailable(context)){
-                val dbData = movieDao.getAllUpcomingMovie()
-                if(dbData.isNotEmpty()){
-                    emit(DataState.Success(dbData))
-                }
-                delay(1000)
-                emit(DataState.Loading)
-                val response = apiService.getAllUpComingMovies(BuildConfig.AUTH_TOKEN,1)
-                if(response.isSuccessful){
-                    val networkData = response.body()
-                    val data = networkData!!.results
-                    data.map {
-                        it.isUpcoming = true
-                        movieDao.insertAll(it)
-                    }
-                    val dbData = movieDao.getAllUpcomingMovie()
-                    emit(DataState.Success(dbData))
-                }
-            }else{
-                val dbData = movieDao.getAllUpcomingMovie()
-                if(dbData!=null){
                     emit(DataState.Success(dbData))
                 }else{
                     emit(DataState.TryAgain)
@@ -127,8 +96,6 @@ class MainRepository @Inject constructor(
                     emit(DataState.TryAgain)
                 }
             }
-            /*val oldDbData = movieDetailDao.getMovieDetail(id)
-            emit(DataState.Success(cacheMapper.mapFromEntity(oldDbData)))*/
         }catch (e:Exception){
             Log.d("api","$e")
             emit(DataState.Error(e))

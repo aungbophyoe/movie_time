@@ -3,6 +3,7 @@ package com.aungbophyoe.space.movietimecodetest.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,14 +14,15 @@ import com.aungbophyoe.space.movietimecodetest.utility.ImageBinderAdapter
 class UpComingMovieAdapter(
     private val context: Context,
     private val itemCardOnClickListener: ItemCardOnClickListener
-) : ListAdapter<MovieCacheEntity, UpComingMovieAdapter.ViewHolder>(UpComingMovieAdapter.DiffUtils) {
+) : PagingDataAdapter<MovieCacheEntity, UpComingMovieAdapter.ViewHolder>(UpComingMovieAdapter.DiffUtils) {
 
     class ViewHolder(private val binding: RvMovieUpcomingItemBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(movie: MovieCacheEntity){
             binding.apply {
-                ImageBinderAdapter.setImageUrl(ivImage,movie.poster_path)
+                ImageBinderAdapter.setImageUrl(ivImage,movie.poster_path ?: "https://picsum.photos/200")
                 tvTitle.text = movie.title
-                tvVote.text = "${movie.vote_average * 10} %"
+                val voteAvg = movie.vote_average ?: 1.0
+                tvVote.text = "${voteAvg * 10} %"
                 tvDescription.text = movie.overview
             }
         }
@@ -28,7 +30,7 @@ class UpComingMovieAdapter(
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     interface ItemCardOnClickListener{
-        fun itemCardOnClick(id:Int)
+        fun itemCardOnClick(id:String)
     }
 
     object DiffUtils : DiffUtil.ItemCallback<MovieCacheEntity>(){
@@ -42,10 +44,6 @@ class UpComingMovieAdapter(
 
     }
 
-    override fun getItemCount(): Int {
-        return currentList.size
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val viewHolder = ViewHolder(
             RvMovieUpcomingItemBinding.inflate(
@@ -57,14 +55,14 @@ class UpComingMovieAdapter(
         viewHolder.itemView.setOnClickListener {
             val position = viewHolder.bindingAdapterPosition
             if (position != RecyclerView.NO_POSITION) {
-                itemCardOnClickListener.itemCardOnClick(currentList[position].id)
+                itemCardOnClickListener.itemCardOnClick(getItem(position)!!.id)
             }
         }
         return viewHolder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val movie = currentList[position]
+        val movie = getItem(position)
         if(movie!=null){
             holder.bind(movie)
         }

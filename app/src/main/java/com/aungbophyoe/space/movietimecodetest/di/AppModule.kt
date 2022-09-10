@@ -1,11 +1,14 @@
 package com.aungbophyoe.space.movietimecodetest.di
 
 import android.content.Context
+import androidx.paging.ExperimentalPagingApi
 import androidx.room.Room
 import com.aungbophyoe.space.movietimecodetest.BuildConfig
 import com.aungbophyoe.space.movietimecodetest.data.MovieDao
 import com.aungbophyoe.space.movietimecodetest.data.MovieDetailDao
+import com.aungbophyoe.space.movietimecodetest.data.RemoteKeysDao
 import com.aungbophyoe.space.movietimecodetest.data.database.MovieDetailDatabase
+import com.aungbophyoe.space.movietimecodetest.data.paging.UpComingMovieRemoteMediator
 import com.aungbophyoe.space.movietimecodetest.mapper.CacheMapper
 import com.aungbophyoe.space.movietimecodetest.mapper.NetworkMapper
 import com.aungbophyoe.space.movietimecodetest.network.ApiService
@@ -81,6 +84,11 @@ object AppModule {
     @Provides
     fun provideMovieDao(movieDetailDatabase: MovieDetailDatabase): MovieDao {
         return movieDetailDatabase.getMovieDao()
+    }
+
+    @Provides
+    fun provideRemoteKeysDao(movieDetailDatabase: MovieDetailDatabase):RemoteKeysDao{
+        return movieDetailDatabase.geRemoteKeys()
     }
 }
 
