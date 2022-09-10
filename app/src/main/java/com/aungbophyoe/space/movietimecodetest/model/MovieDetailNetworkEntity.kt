@@ -4,7 +4,7 @@ data class MovieDetailNetworkEntity(
     val genres: List<Genre>,
     val id: Int,
     val overview: String,
-    val poster_path: String,
+    var poster_path: String?,
     val release_date: String,
     val runtime: Int,
     val status: String,

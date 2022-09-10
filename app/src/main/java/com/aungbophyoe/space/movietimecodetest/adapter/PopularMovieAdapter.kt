@@ -3,6 +3,7 @@ package com.aungbophyoe.space.movietimecodetest.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,7 @@ import com.aungbophyoe.space.movietimecodetest.utility.ImageBinderAdapter
 class PopularMovieAdapter(
     private val context: Context,
     private val itemOnClickListener: ItemOnClickListener
-) : ListAdapter<MovieCacheEntity,PopularMovieAdapter.ViewHolder>(DiffUtils){
+) : PagingDataAdapter<MovieCacheEntity, PopularMovieAdapter.ViewHolder>(DiffUtils){
 
     class ViewHolder(private val binding: RvMoviePopularItemBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(movie: MovieCacheEntity){
@@ -41,23 +42,19 @@ class PopularMovieAdapter(
 
     }
 
-    override fun getItemCount(): Int {
-        return currentList.size
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val viewHolder = ViewHolder(RvMoviePopularItemBinding.inflate(inflater,parent,false))
         viewHolder.itemView.setOnClickListener {
             val position = viewHolder.bindingAdapterPosition
             if (position != RecyclerView.NO_POSITION) {
-                itemOnClickListener.itemOnClick(currentList[position].id)
+                itemOnClickListener.itemOnClick(getItem(position)!!.id)
             }
         }
         return viewHolder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val movie = currentList[position]
+        val movie = getItem(position)
         if(movie!=null){
             holder.bind(movie)
         }

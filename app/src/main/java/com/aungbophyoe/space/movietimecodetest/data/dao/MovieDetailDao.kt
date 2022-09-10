@@ -1,4 +1,4 @@
-package com.aungbophyoe.space.movietimecodetest.data
+package com.aungbophyoe.space.movietimecodetest.data.dao
 
 import androidx.room.*
 import com.aungbophyoe.space.movietimecodetest.model.MovieDetailCacheEntity

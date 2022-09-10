@@ -1,6 +1,6 @@
-package com.aungbophyoe.space.movietimecodetest.data.paging
+package com.aungbophyoe.space.movietimecodetest.paging
 
-import android.util.Log
+
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -22,7 +22,7 @@ class UpComingMovieRemoteMediator constructor(
 )  : RemoteMediator<Int,MovieCacheEntity>() {
     private val STARTING_PAGE_INDEX = 1
 
-    private val remoteKeysDao = database.geRemoteKeys()
+    private val remoteKeysDao = database.geRemoteKeysDao()
     private val movieDao = database.getMovieDao()
 
     override suspend fun initialize(): InitializeAction {
@@ -40,37 +40,30 @@ class UpComingMovieRemoteMediator constructor(
         }
 
       try {
-          delay(1000)
+          delay(2000)
           val response = apiService.getAllUpComingMovies(BuildConfig.AUTH_TOKEN,page)
-          if(response.isSuccessful){
-              val data = response.body()!!.results
-              val endOfList = data.isEmpty()
-              val prevKey = if (page == STARTING_PAGE_INDEX) null else page-1
-              val nextKey = if(endOfList) null else page+1
-              database.withTransaction {
-                  val list = data.map {
-                      MovieCacheEntity(it.id.toString(),it.overview,it.posterPath,it.title,it.voteAverage,isUpcoming = true)
-                  }
-                  if(loadType == LoadType.REFRESH){
-                      remoteKeysDao.clearAll()
-                      movieDao.clearAllMovie()
-                  }
-                  val keys = list.map {
-                      RemoteKeys(it.id,prevKey,nextKey)
-                  }
-                  remoteKeysDao.insertRemote(keys)
-                  movieDao.insertAll(list)
-                  Log.d("main","insert > $page")
+          val data = response.results
+          val endOfList = data.isEmpty()
+          val prevKey = if (page == STARTING_PAGE_INDEX) null else page-1
+          val nextKey = if(endOfList) null else page+1
+          database.withTransaction {
+              val list = data.map {
+                  MovieCacheEntity(it.id.toString(),it.overview,it.posterPath ?: "https://picsum.photos/500",it.title,it.voteAverage,isUpcoming = true)
               }
-              return MediatorResult.Success(endOfPaginationReached = endOfList)
-          }else{
-              return MediatorResult.Success(endOfPaginationReached = true)
+              if(loadType == LoadType.REFRESH){
+                  remoteKeysDao.clearAll()
+                  movieDao.clearAllMovie()
+              }
+              val keys = list.map {
+                  RemoteKeys(it.id,prevKey,nextKey)
+              }
+              remoteKeysDao.insertRemote(keys)
+              movieDao.insertAll(list)
           }
+          return MediatorResult.Success(endOfPaginationReached = endOfList)
       }catch (e:IOException){
-          Log.d("main","error > ${e.message}")
        return   MediatorResult.Error(e)
       }catch (e:HttpException){
-          Log.d("main","errorr > ${e.message}")
           return MediatorResult.Error(e)
       }
     }

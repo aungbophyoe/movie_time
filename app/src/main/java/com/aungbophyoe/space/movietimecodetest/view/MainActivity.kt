@@ -11,6 +11,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.aungbophyoe.space.movietimecodetest.adapter.PopularMovieAdapter
+import com.aungbophyoe.space.movietimecodetest.adapter.PopularMovieLoadStateAdapter
 import com.aungbophyoe.space.movietimecodetest.adapter.UpComingMovieAdapter
 import com.aungbophyoe.space.movietimecodetest.adapter.UpcomingMovieLoadStateAdapter
 import com.aungbophyoe.space.movietimecodetest.databinding.ActivityMainBinding
@@ -43,13 +44,9 @@ class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener
         super.onResume()
         binding!!.apply {
             if(isNetworkAvailable(this@MainActivity)){
-                progressBar.showOrGone(false)
                 rlTryAgain.showOrGone(false)
-                tvError.showOrGone(false)
             }else{
-                progressBar.showOrGone(false)
                 rlTryAgain.showOrGone(true)
-                tvError.showOrGone(false)
             }
         }
     }
@@ -60,13 +57,13 @@ class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener
         val view = _binding!!.root
         setContentView(view)
         intiRecyclerView()
-        homeViewModel.getData()
         observeData()
         binding!!.apply {
             rlTryAgain.setOnClickListener {
                 if(isNetworkAvailable(this@MainActivity)){
-                    homeViewModel.getData()
+                    popularMovieAdapter.retry()
                     upComingMovieAdapter.retry()
+                    rlTryAgain.showOrGone(false)
                 }
             }
         }
@@ -77,44 +74,21 @@ class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener
         binding!!.apply {
             lifecycleScope.launchWhenStarted {
                 try {
-                    homeViewModel.getAllMovies().collectLatest { response->
-                        upComingMovieAdapter.submitData(response)
+                    homeViewModel.getAllPopularMovies().collectLatest { response->
+                        popularMovieAdapter.submitData(response)
                     }
                 }catch (e:Exception){
-                    homeViewModel.getAllMovies().cancellable()
+                    homeViewModel.getAllPopularMovies().cancellable()
                 }
             }
 
-            homeViewModel.data.observe(this@MainActivity){
-                it?.let { dataState ->
-                    when(dataState){
-                        is DataState.Loading -> {
-                            progressBar.showOrGone(true)
-                            rlTryAgain.showOrGone(false)
-                            tvError.showOrGone(false)
-                        }
-                        is DataState.Success -> {
-                            progressBar.showOrGone(false)
-                            rlTryAgain.showOrGone(false)
-                            tvError.showOrGone(false)
-                            val data = dataState.data
-                            if(data!=null){
-                                popularMovieAdapter.submitList(data)
-                                rvPopular.adapter!!.notifyDataSetChanged()
-                            }
-                        }
-                        is DataState.Error -> {
-                            tvError.text = "${dataState.exception.message}"
-                            progressBar.showOrGone(false)
-                            rlTryAgain.showOrGone(false)
-                            tvError.showOrGone(true)
-                        }
-                        is DataState.TryAgain -> {
-                            progressBar.showOrGone(false)
-                            rlTryAgain.showOrGone(true)
-                            tvError.showOrGone(false)
-                        }
+            lifecycleScope.launchWhenStarted {
+                try {
+                    homeViewModel.getAllUpcomingMovies().collectLatest { response->
+                        upComingMovieAdapter.submitData(response)
                     }
+                }catch (e:Exception){
+                    homeViewModel.getAllUpcomingMovies().cancellable()
                 }
             }
         }
@@ -125,7 +99,7 @@ class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener
             rvPopular.apply {
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(this@MainActivity,LinearLayoutManager.HORIZONTAL,false)
-                adapter = popularMovieAdapter
+                adapter = popularMovieAdapter.withLoadStateFooter(PopularMovieLoadStateAdapter())
             }
             rvUpComing.apply {
                 setHasFixedSize(true)
@@ -158,6 +132,7 @@ class MainActivity : AppCompatActivity(),PopularMovieAdapter.ItemOnClickListener
 
     override fun retryOnClick() {
         if(isNetworkAvailable(this)){
+            popularMovieAdapter.retry()
             upComingMovieAdapter.retry()
         }
     }

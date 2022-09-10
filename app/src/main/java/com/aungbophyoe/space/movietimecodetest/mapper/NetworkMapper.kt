@@ -11,7 +11,7 @@ class NetworkMapper @Inject constructor() : EntityMapper<MovieDetailNetworkEntit
             genres += it.name.plus(", ")
         }
         return MovieDetail(id = entity.id, genres = genres, overview = entity.overview,
-            poster_path = entity.poster_path, release_date = entity.release_date,
+            poster_path = entity.poster_path ?: "https://picsum.photos/500", release_date = entity.release_date,
             runtime = entity.runtime.toString(), status = entity.status, title = entity.title,
             vote_average = entity.vote_average.toString(), vote_count = entity.vote_count, fav = false)
     }

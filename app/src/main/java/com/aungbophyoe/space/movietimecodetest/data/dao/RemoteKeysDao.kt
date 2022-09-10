@@ -1,4 +1,4 @@
-package com.aungbophyoe.space.movietimecodetest.data
+package com.aungbophyoe.space.movietimecodetest.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

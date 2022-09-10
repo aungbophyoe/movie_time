@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -18,7 +19,7 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@color/black"
-            android:layout_marginTop="20sp"
+            android:layout_marginTop="10dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             />
@@ -32,13 +33,13 @@
             android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvAppBarTitle"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="5dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="0dp"
-            android:layout_height="220dp"
+            android:layout_height="200dp"
             android:id="@+id/rvPopular"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             tools:listitem="@layout/rv_movie_popular_item"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -60,35 +61,12 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:id="@+id/rvUpComing"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             tools:listitem="@layout/rv_movie_upcoming_item"
             app:layout_constraintTop_toBottomOf="@id/tvUpComing"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Something wrong!"
-            android:visibility="gone"
-            android:id="@+id/tvError"
-            android:textSize="30sp"
-            android:textColor="@color/red"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -96,6 +74,7 @@
             android:id="@+id/rlTryAgain"
             android:padding="16dp"
             android:visibility="gone"
+            android:background="?attr/selectableItemBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
