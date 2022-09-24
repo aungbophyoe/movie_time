@@ -1,6 +1,6 @@
-# Form UI and validation app
+# Movies App
 
-> ### Recommended and upcoming movies 
+> ### Recommended and Upcoming movies list
 <img src="./ss/movie_1.jpg" width="300" height="550">
 <br>
 
